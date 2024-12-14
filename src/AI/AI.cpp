@@ -29,7 +29,7 @@ std::pair<int, int> AI::calculateMove(std::vector<std::vector<char>> boardState,
 }
 
 
-int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, char aiPlayer, char humanPlayer, int depth = 0) {
+int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, char aiPlayer, char humanPlayer, int depth) {
     int score = evaluate(boardState, aiPlayer, humanPlayer);
 
     if (score == 10 || score == -10 || depth >= 6) {

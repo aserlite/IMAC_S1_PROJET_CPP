@@ -2,24 +2,38 @@
 #include <iostream>
 #include <vector>
 
-Play::Play(int boardSize) : board(boardSize), currentPlayer('X') {}
+Play::Play(int boardSize) : board(boardSize), currentPlayer('X'), gameRunning(false), firstPlayer('X') {}
 
 void Play::startSoloGame()
 {
-    bool gameRunning = true;
-    srand (time(NULL));
-    char first_player = rand() % 2 ? 'X' : 'O';
-    if (first_player == 'X') {
-        std::cout << "Vous commencez la partie\n";    
-    } else {
-        std::cout << "L'IA commence la partie\n";    
+    std::cout << "Entrez votre nom: ";
+    std::cin >> player1Name;
+    std::cout << "Choisissez votre symbole (X ou O): ";
+    std::cin >> player1Symbol;
+
+    while (player1Symbol != 'X' && player1Symbol != 'O') {
+        std::cout << "Symbole invalide. Choisissez X ou O: ";
+        std::cin >> player1Symbol;
     }
+
+    player2Symbol = (player1Symbol == 'X') ? 'O' : 'X';
+    player2Name = "IA";
+
+    gameRunning = true;
+    srand(time(NULL));
+    firstPlayer = rand() % 2 ? player1Symbol : player2Symbol;
+    currentPlayer = firstPlayer;
+
+    std::cout << (firstPlayer == player1Symbol ? player1Name : player2Name)
+              << " commence la partie.\n";
+
     while (gameRunning)
     {
         board.displayBoard();
-        int row, col;
-        if (currentPlayer == first_player) {
-            std::cout << "Joueur " << currentPlayer << ", entrez votre coup (ligne colonne) : ";
+        if (currentPlayer == player1Symbol)
+        {
+            int row, col;
+            std::cout << player1Name << " (" << currentPlayer << "), entrez votre coup (ligne colonne) : ";
             std::cin >> row >> col;
 
             if (board.updateCell(row, col, currentPlayer))
@@ -27,7 +41,7 @@ void Play::startSoloGame()
                 if (checkWin())
                 {
                     board.displayBoard();
-                    std::cout << "Le joueur " << currentPlayer << " a gagné !\n";
+                    std::cout << player1Name << " (" << currentPlayer << ") a gagné !\n";
                     gameRunning = false;
                 }
                 else if (checkDraw())
@@ -36,56 +50,64 @@ void Play::startSoloGame()
                     std::cout << "Match nul !\n";
                     gameRunning = false;
                 }
-                else
-                {
+                else {
                     switchPlayer();
                 }
             }
-            else
+        }
+        else
+        {
+            auto [aiRow, aiCol] = ai.calculateMove(board.getState(), player2Symbol);
+            board.updateCell(aiRow, aiCol, player2Symbol);
+            std::cout << "IA (" << player2Symbol << ") a joué en position (" 
+                      << aiRow << ", " << aiCol << ").\n";
+
+            if (checkWin())
             {
-                std::cout << "Coup invalide, réessayez.\n";
-            }
-        } else {
-            std::vector<std::vector<char>> boardState = board.getState();
-            std::pair<int, int> move = ai.calculateMove(boardState, currentPlayer);
-
-            if (move.first != -1 && move.second != -1) {
-                board.updateCell(move.first, move.second, currentPlayer);
-                std::cout << "IA a joué en (" << move.first << ", " << move.second << ")\n";
-
-                if (checkWin())
-                {
-                    board.displayBoard();
-                    std::cout << "L'IA a gagné !\n";
-                    gameRunning = false;
-                }
-                else if (checkDraw())
-                {
-                    board.displayBoard();
-                    std::cout << "Match nul !\n";
-                    gameRunning = false;
-                }
-                else
-                {
-                    switchPlayer();
-                }
-            } else {
-                std::cout << "L'IA n'a pas trouvé de coup valide (bug).\n";
+                board.displayBoard();
+                std::cout << "IA (" << currentPlayer << ") a gagné !\n";
                 gameRunning = false;
+            }
+            else if (checkDraw())
+            {
+                board.displayBoard();
+                std::cout << "Match nul !\n";
+                gameRunning = false;
+            }
+            else {
+                switchPlayer();
             }
         }
     }
 }
 
+
 void Play::startDuoGame()
 {
-    bool gameRunning = true;
+    std::cout << "Entrez le nom du joueur 1: ";
+    std::cin >> player1Name;
+    std::cout << "Choisissez un symbole (X ou O): ";
+    std::cin >> player1Symbol;
+
+    while (player1Symbol != 'X' && player1Symbol != 'O') {
+        std::cout << "Symbole invalide. Choisissez X ou O: ";
+        std::cin >> player1Symbol;
+    }
+
+    std::cout << "Entrez le nom du joueur 2: ";
+    std::cin >> player2Name;
+    player2Symbol = (player1Symbol == 'X') ? 'O' : 'X';
+    std::cout << "Le joueur 2 aura automatiquement le symbole: " << player2Symbol << std::endl;
+
+    currentPlayer = player1Symbol;
+    gameRunning = true;
 
     while (gameRunning)
     {
         board.displayBoard();
         int row, col;
-        std::cout << "Joueur " << currentPlayer << ", entrez votre coup (ligne colonne) : ";
+        std::cout << (currentPlayer == player1Symbol ? player1Name : player2Name) 
+                  << " (" << currentPlayer << "), entrez votre coup (ligne colonne) : ";
         std::cin >> row >> col;
 
         if (board.updateCell(row, col, currentPlayer))
@@ -93,7 +115,8 @@ void Play::startDuoGame()
             if (checkWin())
             {
                 board.displayBoard();
-                std::cout << "Le joueur " << currentPlayer << " a gagné !\n";
+                std::cout << (currentPlayer == player1Symbol ? player1Name : player2Name) 
+                          << " (" << currentPlayer << ") a gagné !\n";
                 gameRunning = false;
             }
             else if (checkDraw())
@@ -114,9 +137,8 @@ void Play::startDuoGame()
     }
 }
 
-void Play::switchPlayer()
-{
-    currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+void Play::switchPlayer() {
+    currentPlayer = (currentPlayer == player1Symbol) ? player2Symbol : player1Symbol;
 }
 
 bool Play::checkWin() const
