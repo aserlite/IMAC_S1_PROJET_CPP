@@ -17,6 +17,8 @@ public:
 
     std::vector<std::vector<char>> getState() const ;
 
+    int getSize() const ;
+
     ~GenBoard();
 
 private:

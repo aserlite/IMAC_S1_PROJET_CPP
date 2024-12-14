@@ -33,26 +33,45 @@ void Play::startSoloGame()
         if (currentPlayer == player1Symbol)
         {
             int row, col;
-            std::cout << player1Name << " (" << currentPlayer << "), entrez votre coup (ligne colonne) : ";
-            std::cin >> row >> col;
+            while (true) {
+                std::cout << player1Name << " (" << currentPlayer << "), entrez votre coup (ligne colonne) : ";
+                if (!(std::cin >> row >> col)) {
+                    std::cout << "Entrée invalide. Veuillez entrer des nombres pour la ligne et la colonne.\n";
+                    std::cin.clear();
+                    std::cin.ignore(1000, '\n');
+                    continue;
+                }
 
-            if (board.updateCell(row, col, currentPlayer))
+                if (row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize()) {
+                    std::cout << "Position hors des limites. Veuillez entrer des valeurs entre 0 et " 
+                              << board.getSize() - 1 << ".\n";
+                    continue;
+                }
+
+                if (!board.isCellFree(row, col)) {
+                    std::cout << "La cellule est déjà occupée. Choisissez une autre position.\n";
+                    continue;
+                }
+
+                if (board.updateCell(row, col, currentPlayer)) {
+                    break;
+                }
+            }
+
+            if (checkWin())
             {
-                if (checkWin())
-                {
-                    board.displayBoard();
-                    std::cout << player1Name << " (" << currentPlayer << ") a gagné !\n";
-                    gameRunning = false;
-                }
-                else if (checkDraw())
-                {
-                    board.displayBoard();
-                    std::cout << "Match nul !\n";
-                    gameRunning = false;
-                }
-                else {
-                    switchPlayer();
-                }
+                board.displayBoard();
+                std::cout << player1Name << " (" << currentPlayer << ") a gagné !\n";
+                gameRunning = false;
+            }
+            else if (checkDraw())
+            {
+                board.displayBoard();
+                std::cout << "Match nul !\n";
+                gameRunning = false;
+            }
+            else {
+                switchPlayer();
             }
         }
         else
@@ -81,7 +100,6 @@ void Play::startSoloGame()
     }
 }
 
-
 void Play::startDuoGame()
 {
     std::cout << "Entrez le nom du joueur 1: ";
@@ -106,33 +124,48 @@ void Play::startDuoGame()
     {
         board.displayBoard();
         int row, col;
-        std::cout << (currentPlayer == player1Symbol ? player1Name : player2Name) 
-                  << " (" << currentPlayer << "), entrez votre coup (ligne colonne) : ";
-        std::cin >> row >> col;
+        while (true) {
+            std::cout << (currentPlayer == player1Symbol ? player1Name : player2Name) 
+                      << " (" << currentPlayer << "), entrez votre coup (ligne colonne) : ";
+            if (!(std::cin >> row >> col)) {
+                std::cout << "Entrée invalide. Veuillez entrer des nombres pour la ligne et la colonne.\n";
+                std::cin.clear();
+                std::cin.ignore(1000, '\n');
+                continue;
+            }
 
-        if (board.updateCell(row, col, currentPlayer))
+            if (row < 0 || row >= board.getSize() || col < 0 || col >= board.getSize()) {
+                std::cout << "Position hors des limites. Veuillez entrer des valeurs entre 0 et " 
+                          << board.getSize() - 1 << ".\n";
+                continue;
+            }
+
+            if (!board.isCellFree(row, col)) {
+                std::cout << "La cellule est déjà occupée. Choisissez une autre position.\n";
+                continue;
+            }
+
+            if (board.updateCell(row, col, currentPlayer)) {
+                break;
+            }
+        }
+
+        if (checkWin())
         {
-            if (checkWin())
-            {
-                board.displayBoard();
-                std::cout << (currentPlayer == player1Symbol ? player1Name : player2Name) 
-                          << " (" << currentPlayer << ") a gagné !\n";
-                gameRunning = false;
-            }
-            else if (checkDraw())
-            {
-                board.displayBoard();
-                std::cout << "Match nul !\n";
-                gameRunning = false;
-            }
-            else
-            {
-                switchPlayer();
-            }
+            board.displayBoard();
+            std::cout << (currentPlayer == player1Symbol ? player1Name : player2Name) 
+                      << " (" << currentPlayer << ") a gagné !\n";
+            gameRunning = false;
+        }
+        else if (checkDraw())
+        {
+            board.displayBoard();
+            std::cout << "Match nul !\n";
+            gameRunning = false;
         }
         else
         {
-            std::cout << "Coup invalide, réessayez.\n";
+            switchPlayer();
         }
     }
 }

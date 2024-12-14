@@ -43,6 +43,11 @@ std::vector<std::vector<char>> GenBoard::getState() const
     return grid;
 }
 
+int GenBoard::getSize() const
+{
+    return size;
+}
+
 GenBoard::~GenBoard()
 {
 }
