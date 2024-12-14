@@ -13,7 +13,7 @@ public:
     ~AI();
 
 private:
-    int minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, char aiPlayer, char humanPlayer);
+    int minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, char aiPlayer, char humanPlayer, int depth = 0);
     bool isMovesLeft(const std::vector<std::vector<char>>& boardState) const;
     int evaluate(const std::vector<std::vector<char>>& boardState, char aiPlayer, char humanPlayer) const;
 };

@@ -29,10 +29,10 @@ std::pair<int, int> AI::calculateMove(std::vector<std::vector<char>> boardState,
 }
 
 
-int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, char aiPlayer, char humanPlayer) {
+int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, char aiPlayer, char humanPlayer, int depth = 0) {
     int score = evaluate(boardState, aiPlayer, humanPlayer);
 
-    if (score == 10 || score == -10) {
+    if (score == 10 || score == -10 || depth >= 6) {
         return score;
     }
 
@@ -47,7 +47,7 @@ int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, c
             for (size_t j = 0; j < boardState[i].size(); ++j) {
                 if (boardState[i][j] == ' ') {
                     boardState[i][j] = aiPlayer;
-                    best = std::max(best, minimax(boardState, false, aiPlayer, humanPlayer));
+                    best = std::max(best, minimax(boardState, false, aiPlayer, humanPlayer, depth + 1));
                     boardState[i][j] = ' ';
                 }
             }
@@ -62,7 +62,7 @@ int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, c
             for (size_t j = 0; j < boardState[i].size(); ++j) {
                 if (boardState[i][j] == ' ') {
                     boardState[i][j] = humanPlayer;
-                    best = std::min(best, minimax(boardState, true, aiPlayer, humanPlayer));
+                    best = std::min(best, minimax(boardState, true, aiPlayer, humanPlayer, depth + 1));
                     boardState[i][j] = ' ';
                 }
             }
@@ -70,6 +70,7 @@ int AI::minimax(std::vector<std::vector<char>>& boardState, bool isMaximizing, c
         return best;
     }
 }
+
 
 bool AI::isMovesLeft(const std::vector<std::vector<char>>& boardState) const {
     for (const auto& row : boardState) {
